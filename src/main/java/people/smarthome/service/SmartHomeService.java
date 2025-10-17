@@ -256,4 +256,41 @@ public class SmartHomeService {
             log.warn("Failed to save device state: {}", e.getMessage());
         }
     }
+
+    public void setPowerLevel(String deviceId, int powerLevel) {
+        Device device = getDevice(deviceId);
+        device.setPowerLevel(powerLevel);
+        saveDeviceState(device);
+    }
+
+    public void setBrightness(String deviceId, int brightness) {
+        Device device = getDevice(deviceId);
+        if (device instanceof Light) {
+            ((Light) device).setBrightness(brightness);
+            saveDeviceState(device);
+        } else {
+            throw new IllegalArgumentException("Device is not a light.");
+        }
+    }
+
+    // Set water flow for the sprinkler device
+    public void setWaterFlow(String deviceId, int waterFlow) {
+        Device device = getDevice(deviceId);
+        if (device instanceof Sprinkler) {
+            ((Sprinkler) device).setWaterFlow(waterFlow);
+            saveDeviceState(device);
+        } else {
+            throw new IllegalArgumentException("Device is not a sprinkler.");
+        }
+    }
+
+    public void setTemperature(String deviceId, int temperature) {
+        Device device = getDevice(deviceId);
+        if (device instanceof Thermostat) {
+            ((Thermostat) device).setTemperature(temperature);
+            saveDeviceState(device);
+        } else {
+            throw new IllegalArgumentException("Device is not a thermostat.");
+        }
+    }
 }
