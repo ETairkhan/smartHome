@@ -1,5 +1,8 @@
 package people.smarthome.shell;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import people.smarthome.facade.HomeAutomationFacade;
 import people.smarthome.service.SmartHomeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.shell.standard.ShellComponent;
@@ -11,6 +14,7 @@ import java.util.Map;
 @ShellComponent
 @RequiredArgsConstructor
 public class SmartHomeCommands {
+    private static final Logger log = LoggerFactory.getLogger(SmartHomeCommands.class);
     private final SmartHomeService smartHomeService;
 
     @ShellMethod(key = "scene", value = "Activate a scene: night, party, away, garden")
@@ -22,10 +26,17 @@ public class SmartHomeCommands {
     @ShellMethod(key = "devices", value = "Show all devices status")
     public String listDevices() {
         var statuses = smartHomeService.getDeviceStatuses();
+        if (statuses.isEmpty()) {
+            log.info("No devices found or devices are inactive.");
+        } else {
+            statuses.forEach(status -> log.info("Device status: {}", status));
+        }
         var output = new StringBuilder("🏠 Smart Home Devices:\n");
         statuses.forEach(status -> output.append("• ").append(status).append("\n"));
         return output.toString();
     }
+
+
 
     @ShellMethod(key = "toggle", value = "Toggle device on/off")
     public String toggleDevice(@ShellOption String device) {

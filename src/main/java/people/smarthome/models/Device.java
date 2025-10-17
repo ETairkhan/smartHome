@@ -44,6 +44,7 @@ public abstract class Device {
     }
 
     public String getStatus() {
-        return isActive ? "Active" : "Inactive";
+        return (isActive != null && isActive) ? "Active" : "Inactive";
     }
+
 }

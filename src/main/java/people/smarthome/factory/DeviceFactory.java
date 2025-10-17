@@ -17,7 +17,7 @@ public class DeviceFactory {
         light.setDeviceType("LIGHT");
         light.setBrightness(50); // Set default brightness
         light.setPowerLevel(60); // Default power level
-        light.setIsActive(false); // Default state is inactive
+        light.setIsActive(true); // Default state is inactive
         return light;
     }
 
@@ -37,7 +37,7 @@ public class DeviceFactory {
         sprinkler.setDeviceType("SPRINKLER");
         sprinkler.setWaterFlow(50); // Default water flow
         sprinkler.setPowerLevel(40); // Default power level
-        sprinkler.setIsActive(false); // Default state is inactive
+        sprinkler.setIsActive(true); // Default state is inactive
         return sprinkler;
     }
 
@@ -47,7 +47,7 @@ public class DeviceFactory {
         door.setDeviceType("DOOR");
         door.setIsLocked(true); // Default door is locked
         door.setPowerLevel(10); // Default power level
-        door.setIsActive(false); // Default state is inactive
+        door.setIsActive(true); // Default state is inactive
         return door;
     }
 
@@ -57,7 +57,7 @@ public class DeviceFactory {
         window.setDeviceType("WINDOW");
         window.setIsLocked(true); // Default window is locked
         window.setPowerLevel(5); // Default power level
-        window.setIsActive(false); // Default state is inactive
+        window.setIsActive(true); // Default state is inactive
         return window;
     }
 

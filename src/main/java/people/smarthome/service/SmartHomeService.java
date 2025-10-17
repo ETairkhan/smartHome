@@ -37,14 +37,15 @@ public class SmartHomeService {
     @PostConstruct
     @Transactional
     public void initialize() {
-        log.info("Initializing Smart Home Service...");
-        loadDevicesFromDatabase();
-
         // Ensure default devices are created if no devices exist in the DB
         if (doorRepository.count() == 0 && lightRepository.count() == 0 &&
                 sprinklerRepository.count() == 0 && thermostatRepository.count() == 0 && windowRepository.count() == 0) {
             createDefaultDevices();
         }
+        log.info("Initializing Smart Home Service...");
+        loadDevicesFromDatabase();
+
+
     }
 
     private void createDefaultDevices() {
@@ -57,23 +58,32 @@ public class SmartHomeService {
                 deviceFactory.createWindow("Kitchen Window")
         );
 
+        // Log creation
+        log.info("Creating {} default devices", defaultDevices.size());
+
         // Save the default devices to their respective repositories
         defaultDevices.forEach(device -> {
             if (device instanceof Light) {
                 lightRepository.save((Light) device);
+                log.info("Saved default device: {}", device.getName());
             } else if (device instanceof Thermostat) {
                 thermostatRepository.save((Thermostat) device);
+                log.info("Saved default device: {}", device.getName());
             } else if (device instanceof Sprinkler) {
                 sprinklerRepository.save((Sprinkler) device);
+                log.info("Saved default device: {}", device.getName());
             } else if (device instanceof Door) {
                 doorRepository.save((Door) device);
+                log.info("Saved default device: {}", device.getName());
             } else if (device instanceof Window) {
                 windowRepository.save((Window) device);
+                log.info("Saved default device: {}", device.getName());
             }
         });
 
         log.info("Created {} default devices", defaultDevices.size());
     }
+
 
     private void loadDevicesFromDatabase() {
         // Fetch devices from specific repositories
@@ -84,15 +94,31 @@ public class SmartHomeService {
         List<Window> windows = windowRepository.findAll();
 
         // Add devices to the map (with ID generation and enhancement)
-        doors.forEach(door -> devices.put("door_" + door.getId(), enhanceDevice(door)));
-        lights.forEach(light -> devices.put("light_" + light.getId(), enhanceDevice(light)));
-        sprinklers.forEach(sprinkler -> devices.put("sprinkler_" + sprinkler.getId(), enhanceDevice(sprinkler)));
-        thermostats.forEach(thermostat -> devices.put("thermostat_" + thermostat.getId(), enhanceDevice(thermostat)));
-        windows.forEach(window -> devices.put("window_" + window.getId(), enhanceDevice(window)));
+        doors.forEach(door -> {
+            devices.put("doors_" + door.getId(), enhanceDevice(door));
+            log.info("Loaded device: {} - {}", door.getName(), door.getStatus()); // Log each device
+        });
+        lights.forEach(light -> {
+            devices.put("lights_" + light.getId(), enhanceDevice(light));
+            log.info("Loaded device: {} - {}", light.getName(), light.getStatus()); // Log each device
+        });
+        sprinklers.forEach(sprinkler -> {
+            devices.put("sprinklers_" + sprinkler.getId(), enhanceDevice(sprinkler));
+            log.info("Loaded device: {} - {}", sprinkler.getName(), sprinkler.getStatus()); // Log each device
+        });
+        thermostats.forEach(thermostat -> {
+            devices.put("thermostats_" + thermostat.getId(), enhanceDevice(thermostat));
+            log.info("Loaded device: {} - {}", thermostat.getName(), thermostat.getStatus()); // Log each device
+        });
+        windows.forEach(window -> {
+            devices.put("windows_" + window.getId(), enhanceDevice(window));
+            log.info("Loaded device: {} - {}", window.getName(), window.getStatus()); // Log each device
+        });
 
         homeAutomationFacade.addDevices(new ArrayList<>(devices.values()));
         log.info("Loaded {} devices from the database", devices.size());
     }
+
 
     private String generateDeviceId(String name) {
         return name.toLowerCase().replace(" ", "_");
@@ -135,11 +161,13 @@ public class SmartHomeService {
 
     public Map<String, String> getAvailableDevices() {
         Map<String, String> available = new HashMap<>();
-        devices.forEach((id, device) ->
-                available.put(id, getBaseDevice(device).getName())
-        );
+        devices.forEach((id, device) -> {
+            available.put(id, getBaseDevice(device).getName());
+            log.info("Available Device: {} - {}", id, getBaseDevice(device).getName());  // Log each device
+        });
         return available;
     }
+
 
     // Device Management Methods
     public String addNewDevice(String name, String deviceType) {
@@ -169,7 +197,7 @@ public class SmartHomeService {
     public void removeDevice(String deviceId) {
         Device device = getDevice(deviceId);
         Device baseDevice = getBaseDevice(device);
-
+        System.out.println("Devices in the map: " + devices);
         if (baseDevice instanceof Light) {
             lightRepository.delete((Light) baseDevice);
         } else if (baseDevice instanceof Thermostat) {
