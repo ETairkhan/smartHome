@@ -148,4 +148,13 @@ public abstract class DeviceDecorator extends Device {
     public void toggle() {
         decoratedDevice.toggle();
     }
+
+    // Method to handle decorated devices
+    private Device getBaseDevice(Device device) {
+        while (device instanceof DeviceDecorator) {
+            device = ((DeviceDecorator) device).getDecoratedDevice();  // Unwrap the decorated device
+        }
+        return device;  // Return the original device
+    }
+
 }

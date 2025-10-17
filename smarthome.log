@@ -61,3 +61,61 @@
 1760701023735:set-water-flow "Garden Sprinkler" 60
 1760701060955:devices
 1760701092274:set-water-flow sprinklers_1
+1760702359909:help
+1760702433072:set-water-flow sprinklers_1
+1760702442733:set-water-flow sprinklers_1 60
+1760702467093:set-water-flow "Garden Sprinkler" 60
+1760702478209:devices
+1760702481755:help
+1760702493340:add-device "akjsfd;lkasj" door
+1760702521576:remove-device akjsfd;lkasj
+1760702632939:set-water-flow sprinklers_1 60
+1760702640452:stacktrace
+1760702721775:devices
+1760702967665:help
+1760702981990:set-water-flow "Garden Sprinkler" 60
+1760703244177:help
+1760703258389:set-water-flow "Garden Sprinkler" 60
+1760704156650:devices
+1760704162121:help
+1760704182493:set-power-level "SOMETHING" 8
+1760704204440:set-power-level "Front Door" 9
+1760704529887:hellp
+1760704531178:help
+1760704541071:set-power-level "Front Door" 80
+1760704766709:help
+1760704780025:set-power-level "SOMETHING" 80
+1760705143873:help
+1760705154969:set-power-level "SOMETHING" 30
+1760705191887:help
+1760705212450:set-water-flow "Garden Sprinkler" 80
+1760705440350:help
+1760705451046:set-water-flow "Garden Sprinkler" 80
+1760705459184:stacktrace
+1760711793775:help
+1760711835346:set-power-level "Garden Sprinkler" 20
+1760711845132:help
+1760711875658:set-temperature "Main Thermostat" 30
+1760711937293:add-device "SOMETHING" thermostat
+1760711951821:set-temperature "SOMETHING" 30
+1760712396716:help
+1760712421539:set-water-flow "Garden Sprinkler" 30
+1760712483490:help
+1760712509231:set-brightness "lighting" 30
+1760712538044:set-brightness "lighting" 100
+1760712550921:help
+1760712569439:set-temperature "SOMETHING" 300
+1760712612592:help
+1760712625334:set-temperature "SOMETHING" 300
+1760712667923:stacktrace
+1760712851354:help
+1760712860859:remove-device "SOMETHING"
+1760712865940:stacktrace
+1760712885342:remove-device "Main Thermostat"
+1760712898558:help
+1760712936708:set-temperature "Main Temperature" 300
+1760712950740:set-temperature "Main Thermostat" 300
+1760712961042:help
+1760712967758:remove-device door_1
+1760712972760:stacktrace
+1760713005502:remove-device doors_1

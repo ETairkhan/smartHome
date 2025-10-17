@@ -208,10 +208,6 @@ public class SmartHomeService {
         return List.of("LIGHT", "THERMOSTAT", "SPRINKLER", "DOOR", "WINDOW");
     }
 
-    private Device getDevice(String deviceId) {
-        return devices.computeIfAbsent(deviceId,
-                id -> { throw new IllegalArgumentException("Device not found: " + id); });
-    }
 
     private Device getBaseDevice(Device device) {
         while (device instanceof DeviceDecorator) {
@@ -241,56 +237,125 @@ public class SmartHomeService {
 
     private void saveDeviceState(Device device) {
         try {
-            if (device instanceof Light) {
-                lightRepository.save((Light) device);
-            } else if (device instanceof Thermostat) {
-                thermostatRepository.save((Thermostat) device);
-            } else if (device instanceof Sprinkler) {
-                sprinklerRepository.save((Sprinkler) device);
-            } else if (device instanceof Door) {
-                doorRepository.save((Door) device);
-            } else if (device instanceof Window) {
-                windowRepository.save((Window) device);
+            // Check if the device is decorated, if yes, delegate the save operation to the decorated device
+            Device baseDevice = getBaseDevice(device);  // Get the actual base device
+
+            if (baseDevice instanceof Light) {
+                lightRepository.save((Light) baseDevice);
+                lightRepository.flush();  // Ensure the changes are immediately flushed to the database
+                log.info("Saved Light device '{}' with power level {}", baseDevice.getName(), baseDevice.getPowerLevel());
+            } else if (baseDevice instanceof Thermostat) {
+                thermostatRepository.save((Thermostat) baseDevice);
+                thermostatRepository.flush();  // Ensure the changes are immediately flushed to the database
+                log.info("Saved Thermostat device '{}' with temperature {}", baseDevice.getName(), ((Thermostat) baseDevice).getTemperature());
+            } else if (baseDevice instanceof Sprinkler) {
+                sprinklerRepository.save((Sprinkler) baseDevice);
+                sprinklerRepository.flush();  // Ensure the changes are immediately flushed to the database
+                log.info("Saved Sprinkler device '{}' with water flow {}", baseDevice.getName(), ((Sprinkler) baseDevice).getWaterFlow());
+            } else if (baseDevice instanceof Door) {
+                doorRepository.save((Door) baseDevice);
+                doorRepository.flush();  // Ensure the changes are immediately flushed to the database
+                log.info("Saved Door device '{}' with power level {}", baseDevice.getName(), baseDevice.getPowerLevel());
+            } else if (baseDevice instanceof Window) {
+                windowRepository.save((Window) baseDevice);
+                windowRepository.flush();  // Ensure the changes are immediately flushed to the database
+                log.info("Saved Window device '{}' with state {}", baseDevice.getName(), baseDevice.getIsActive());
             }
         } catch (Exception e) {
-            log.warn("Failed to save device state: {}", e.getMessage());
+            log.warn("Failed to save device state for device '{}': {}", device.getName(), e.getMessage());
         }
     }
 
+
+
+
+    public String getDeviceIdByName(String deviceName) {
+        log.info("Searching for device with name: {}", deviceName);  // Log the device name being searched
+        // Iterate through all devices and compare names (case-insensitive)
+        for (Map.Entry<String, Device> entry : devices.entrySet()) {
+            log.debug("Checking device: {} with name: {}", entry.getKey(), entry.getValue().getName()); // Log each device checked
+            if (entry.getValue().getName().equalsIgnoreCase(deviceName.trim())) {
+                log.info("Device found: {} with ID: {}", deviceName, entry.getKey()); // Log successful match
+                return entry.getKey(); // Return the device ID if names match
+            }
+        }
+        log.warn("Device with name '{}' not found", deviceName);  // Log if the device was not found
+        throw new IllegalArgumentException("Device with name '" + deviceName + "' not found.");
+    }
+
     public void setPowerLevel(String deviceId, int powerLevel) {
+        log.info("Setting power level for device {} to {}", deviceId, powerLevel);
         Device device = getDevice(deviceId);
         device.setPowerLevel(powerLevel);
         saveDeviceState(device);
+        log.info("Power level for device {} set to {}", deviceId, powerLevel);
     }
 
+
+    @Transactional
     public void setBrightness(String deviceId, int brightness) {
-        Device device = getDevice(deviceId);
-        if (device instanceof Light) {
-            ((Light) device).setBrightness(brightness);
-            saveDeviceState(device);
+        log.info("Setting brightness for device {} to {}", deviceId, brightness);
+
+        Device device = getDevice(deviceId);  // Get the decorated device
+        Device baseDevice = getBaseDevice(device);  // Get the base device (unwrapped from the decorator)
+
+        if (baseDevice instanceof Light) {
+            ((Light) baseDevice).setBrightness(brightness);  // Set brightness for the base Light device
+            saveDeviceState(baseDevice);  // Save the device state to the database
+            log.info("Brightness for device {} set to {}", deviceId, brightness);
         } else {
             throw new IllegalArgumentException("Device is not a light.");
         }
     }
 
-    // Set water flow for the sprinkler device
+
+
+    @Transactional
     public void setWaterFlow(String deviceId, int waterFlow) {
-        Device device = getDevice(deviceId);
-        if (device instanceof Sprinkler) {
-            ((Sprinkler) device).setWaterFlow(waterFlow);
-            saveDeviceState(device);
+        log.info("Setting water flow for device {} to {}", deviceId, waterFlow);
+
+        Device device = getDevice(deviceId);  // Get the decorated device
+        Device baseDevice = getBaseDevice(device);  // Get the base device (unwrapped from the decorator)
+
+        if (baseDevice instanceof Sprinkler) {
+            ((Sprinkler) baseDevice).setWaterFlow(waterFlow);  // Set water flow for the base Sprinkler device
+            saveDeviceState(baseDevice);  // Save the device state to the database
+            log.info("Water flow for device {} set to {}", deviceId, waterFlow);
         } else {
             throw new IllegalArgumentException("Device is not a sprinkler.");
         }
     }
 
+    @Transactional
     public void setTemperature(String deviceId, int temperature) {
+        log.info("Setting temperature for device {} to {}", deviceId, temperature);
+
+        // Get the decorated device first
         Device device = getDevice(deviceId);
-        if (device instanceof Thermostat) {
-            ((Thermostat) device).setTemperature(temperature);
-            saveDeviceState(device);
+
+        // Unwrap the decorator and get the base device
+        Device baseDevice = getBaseDevice(device);
+
+        // Check if the base device is a Thermostat
+        if (baseDevice instanceof Thermostat) {
+            ((Thermostat) baseDevice).setTemperature(temperature);  // Set temperature for the base Thermostat device
+            saveDeviceState(baseDevice);  // Save the device state to the database
+            log.info("Temperature for device {} set to {}", deviceId, temperature);
         } else {
             throw new IllegalArgumentException("Device is not a thermostat.");
         }
     }
+
+
+
+    // Helper method to get device by ID
+    private Device getDevice(String deviceId) {
+        Device device = devices.get(deviceId);
+        if (device == null) {
+            throw new IllegalArgumentException("Device not found: " + deviceId);
+        }
+        return device;
+    }
+
+
 }
