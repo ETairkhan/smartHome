@@ -97,7 +97,7 @@ public class SmartHomeCommands {
 
             Enhancements:
             • assistant - 🤖 Smart assistant integration
-            • eco       - 🌿 Energy and resource optimization  
+            • eco       - 🌿 Energy and resource optimization
             • cloud     - ☁️ Remote access and analytics
             • security  - 🔒 Advanced security features
             """);

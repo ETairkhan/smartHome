@@ -3,6 +3,11 @@ package people.smarthome.decorators;
 import lombok.Getter;
 import people.smarthome.models.Device;
 import lombok.AllArgsConstructor;
+import people.smarthome.models.Light;
+import people.smarthome.models.Door;
+import people.smarthome.models.Sprinkler;
+import people.smarthome.models.Thermostat;
+import people.smarthome.models.Window;
 
 @AllArgsConstructor
 public abstract class DeviceDecorator extends Device {
@@ -51,16 +56,6 @@ public abstract class DeviceDecorator extends Device {
     }
 
     @Override
-    public boolean isTurnedOn() {
-        return decoratedDevice.isTurnedOn();
-    }
-
-    @Override
-    public void setTurnedOn(boolean turnedOn) {
-        decoratedDevice.setTurnedOn(turnedOn);
-    }
-
-    @Override
     public String getDeviceType() {
         return decoratedDevice.getDeviceType();
     }
@@ -70,55 +65,74 @@ public abstract class DeviceDecorator extends Device {
         decoratedDevice.setDeviceType(deviceType);
     }
 
-    @Override
     public Integer getBrightness() {
-        return decoratedDevice.getBrightness();
+        if (decoratedDevice instanceof Light light) {
+            return light.getBrightness();
+        }
+        return null;
     }
 
-    @Override
     public void setBrightness(Integer brightness) {
-        decoratedDevice.setBrightness(brightness);
+        if (decoratedDevice instanceof Light light) {
+            light.setBrightness(brightness);
+        }
     }
 
-    @Override
+
     public Integer getTemperature() {
-        return decoratedDevice.getTemperature();
+        if (decoratedDevice instanceof Thermostat thermostat) {
+            return thermostat.getTemperature();
+        }
+        return null;
     }
 
-    @Override
     public void setTemperature(Integer temperature) {
-        decoratedDevice.setTemperature(temperature);
+        if (decoratedDevice instanceof Thermostat thermostat) {
+            thermostat.setTemperature(temperature);
+        }
     }
 
-    @Override
     public Integer getWaterFlow() {
-        return decoratedDevice.getWaterFlow();
+        if (decoratedDevice instanceof Sprinkler sprinkler) {
+            return sprinkler.getWaterFlow();
+        }
+        return null;
     }
 
-    @Override
     public void setWaterFlow(Integer waterFlow) {
-        decoratedDevice.setWaterFlow(waterFlow);
+        if (decoratedDevice instanceof Sprinkler sprinkler) {
+            sprinkler.setWaterFlow(waterFlow);
+        }
     }
 
-    @Override
     public Boolean getIsLocked() {
-        return decoratedDevice.getIsLocked();
+        if (decoratedDevice instanceof Door door) {
+            return door.getIsLocked();
+        }
+        if (decoratedDevice instanceof Window window) {
+            return window.getIsLocked();
+        }
+        return null;
     }
 
-    @Override
     public void setIsLocked(Boolean locked) {
-        decoratedDevice.setIsLocked(locked);
+        if (decoratedDevice instanceof Door door) {
+            door.setIsLocked(locked);
+        }
+        if (decoratedDevice instanceof Window window) {
+            window.setIsLocked(locked);
+        }
     }
 
-    @Override
-    public String getZone() {
-        return decoratedDevice.getZone();
-    }
-
-    @Override
-    public void setZone(String zone) {
-        decoratedDevice.setZone(zone);
-    }
+//    @Override
+//    public String getZone() {
+//        return decoratedDevice.getZone();
+//    }
+//
+//    @Override
+//    public void setZone(String zone) {
+//        decoratedDevice.setZone(zone);
+//    }
 
     @Override
     public Integer getPowerLevel() {

@@ -1,16 +1,19 @@
 package people.smarthome.service;
 
-import people.smarthome.models.Device;
-import people.smarthome.repository.DeviceRepository;
+
+import jakarta.annotation.PostConstruct;
 import people.smarthome.factory.DeviceFactory;
 import people.smarthome.facade.HomeAutomationFacade;
 import people.smarthome.decorators.*;
-import jakarta.annotation.PostConstruct;
+import people.smarthome.repository.*;
+import people.smarthome.models.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +23,13 @@ import java.util.Map;
 @Slf4j
 public class SmartHomeService {
     private final HomeAutomationFacade homeAutomationFacade;
-    private final DeviceRepository deviceRepository;
+
+    // Inject the specific repositories for each device type
+    private final DoorRepository doorRepository;
+    private final LightRepository lightRepository;
+    private final SprinklerRepository sprinklerRepository;
+    private final ThermostatRepository thermostatRepository;
+    private final WindowRepository windowRepository;
     private final DeviceFactory deviceFactory;
 
     private final Map<String, Device> devices = new HashMap<>();
@@ -28,14 +37,14 @@ public class SmartHomeService {
     @PostConstruct
     @Transactional
     public void initialize() {
-        log.info("Initializing smart home system...");
+        log.info("Initializing Smart Home Service...");
+        loadDevicesFromDatabase();
 
-        if (deviceRepository.count() == 0) {
+        // Ensure default devices are created if no devices exist in the DB
+        if (doorRepository.count() == 0 && lightRepository.count() == 0 &&
+                sprinklerRepository.count() == 0 && thermostatRepository.count() == 0 && windowRepository.count() == 0) {
             createDefaultDevices();
         }
-
-        loadDevicesFromDatabase();
-        log.info("System initialized with {} devices", devices.size());
     }
 
     private void createDefaultDevices() {
@@ -48,17 +57,41 @@ public class SmartHomeService {
                 deviceFactory.createWindow("Kitchen Window")
         );
 
-        deviceRepository.saveAll(defaultDevices);
+        // Save the default devices to their respective repositories
+        defaultDevices.forEach(device -> {
+            if (device instanceof Light) {
+                lightRepository.save((Light) device);
+            } else if (device instanceof Thermostat) {
+                thermostatRepository.save((Thermostat) device);
+            } else if (device instanceof Sprinkler) {
+                sprinklerRepository.save((Sprinkler) device);
+            } else if (device instanceof Door) {
+                doorRepository.save((Door) device);
+            } else if (device instanceof Window) {
+                windowRepository.save((Window) device);
+            }
+        });
+
         log.info("Created {} default devices", defaultDevices.size());
     }
 
     private void loadDevicesFromDatabase() {
-        deviceRepository.findAll().forEach(device -> {
-            String deviceId = generateDeviceId(device.getName());
-            Device enhancedDevice = enhanceDevice(device);
-            devices.put(deviceId, enhancedDevice);
-            homeAutomationFacade.addDevice(enhancedDevice);
-        });
+        // Fetch devices from specific repositories
+        List<Door> doors = doorRepository.findAll();
+        List<Light> lights = lightRepository.findAll();
+        List<Sprinkler> sprinklers = sprinklerRepository.findAll();
+        List<Thermostat> thermostats = thermostatRepository.findAll();
+        List<Window> windows = windowRepository.findAll();
+
+        // Add devices to the map (with ID generation and enhancement)
+        doors.forEach(door -> devices.put("door_" + door.getId(), enhanceDevice(door)));
+        lights.forEach(light -> devices.put("light_" + light.getId(), enhanceDevice(light)));
+        sprinklers.forEach(sprinkler -> devices.put("sprinkler_" + sprinkler.getId(), enhanceDevice(sprinkler)));
+        thermostats.forEach(thermostat -> devices.put("thermostat_" + thermostat.getId(), enhanceDevice(thermostat)));
+        windows.forEach(window -> devices.put("window_" + window.getId(), enhanceDevice(window)));
+
+        homeAutomationFacade.addDevices(new ArrayList<>(devices.values()));
+        log.info("Loaded {} devices from the database", devices.size());
     }
 
     private String generateDeviceId(String name) {
@@ -66,11 +99,13 @@ public class SmartHomeService {
     }
 
     private Device enhanceDevice(Device device) {
+        // Apply device-specific enhancements based on device type
         return switch (device.getDeviceType()) {
             case "LIGHT" -> new SmartAssistantDecorator(new EcoFriendlyDecorator(device));
             case "THERMOSTAT" -> new CloudConnectDecorator(new SmartAssistantDecorator(device));
             case "DOOR" -> new SecurityBoostDecorator(new CloudConnectDecorator(device));
             case "SPRINKLER" -> new EcoFriendlyDecorator(device);
+            case "WINDOW" -> new SmartAssistantDecorator(device);
             default -> device;
         };
     }
@@ -109,12 +144,23 @@ public class SmartHomeService {
     // Device Management Methods
     public String addNewDevice(String name, String deviceType) {
         Device newDevice = deviceFactory.createFromType(name, deviceType);
-        Device savedDevice = deviceRepository.save(newDevice);
+
+        // Save the new device to the appropriate repository
+        if (newDevice instanceof Light) {
+            newDevice = lightRepository.save((Light) newDevice);
+        } else if (newDevice instanceof Thermostat) {
+            newDevice = thermostatRepository.save((Thermostat) newDevice);
+        } else if (newDevice instanceof Sprinkler) {
+            newDevice = sprinklerRepository.save((Sprinkler) newDevice);
+        } else if (newDevice instanceof Door) {
+            newDevice = doorRepository.save((Door) newDevice);
+        } else if (newDevice instanceof Window) {
+            newDevice = windowRepository.save((Window) newDevice);
+        }
 
         String deviceId = generateDeviceId(name);
-        Device enhancedDevice = enhanceDevice(savedDevice);
-        devices.put(deviceId, enhancedDevice);
-        homeAutomationFacade.addDevice(enhancedDevice);
+        devices.put(deviceId, enhanceDevice(newDevice));
+        homeAutomationFacade.addDevice(newDevice);
 
         log.info("Added new device: {} ({})", name, deviceType);
         return deviceId;
@@ -124,10 +170,20 @@ public class SmartHomeService {
         Device device = getDevice(deviceId);
         Device baseDevice = getBaseDevice(device);
 
-        deviceRepository.delete(baseDevice);
+        if (baseDevice instanceof Light) {
+            lightRepository.delete((Light) baseDevice);
+        } else if (baseDevice instanceof Thermostat) {
+            thermostatRepository.delete((Thermostat) baseDevice);
+        } else if (baseDevice instanceof Sprinkler) {
+            sprinklerRepository.delete((Sprinkler) baseDevice);
+        } else if (baseDevice instanceof Door) {
+            doorRepository.delete((Door) baseDevice);
+        } else if (baseDevice instanceof Window) {
+            windowRepository.delete((Window) baseDevice);
+        }
+
         devices.remove(deviceId);
         updateFacade();
-
         log.info("Removed device: {}", deviceId);
     }
 
@@ -169,7 +225,18 @@ public class SmartHomeService {
 
     private void saveDeviceState(Device device) {
         try {
-            deviceRepository.save(getBaseDevice(device));
+            // Save state to the correct repository
+            if (device instanceof Light) {
+                lightRepository.save((Light) device);
+            } else if (device instanceof Thermostat) {
+                thermostatRepository.save((Thermostat) device);
+            } else if (device instanceof Sprinkler) {
+                sprinklerRepository.save((Sprinkler) device);
+            } else if (device instanceof Door) {
+                doorRepository.save((Door) device);
+            } else if (device instanceof Window) {
+                windowRepository.save((Window) device);
+            }
         } catch (Exception e) {
             log.warn("Failed to save device state: {}", e.getMessage());
         }

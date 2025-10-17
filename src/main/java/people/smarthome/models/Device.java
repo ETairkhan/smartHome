@@ -6,13 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
-@Table(name = "devices")
+@MappedSuperclass
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class Device {
+public abstract class Device {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,26 +23,17 @@ public class Device {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    @Column(name = "device_type", nullable = false)
-    private String deviceType;
-
-    @Column(name = "brightness")
-    private Integer brightness;
-
-    @Column(name = "temperature")
-    private Integer temperature;
-
-    @Column(name = "water_flow")
-    private Integer waterFlow;
-
-    @Column(name = "is_locked")
-    private Boolean isLocked;
-
-    @Column(name = "zone")
-    private String zone;
-
     @Column(name = "power_level")
     private Integer powerLevel;
+
+    // Abstract methods to be implemented by subclasses
+    public abstract String getDeviceType();
+    public abstract void setDeviceType(String deviceType);
+
+    public void operate() {
+        toggle();
+        System.out.println(name + " operated - Status: " + (isActive ? "ACTIVE" : "INACTIVE"));
+    }
 
     public void toggle() {
         if (this.isActive == null) {
@@ -52,22 +43,7 @@ public class Device {
         }
     }
 
-    public void operate() {
-        toggle();
-        System.out.println(name + " operated - Status: " + (isActive ? "ACTIVE" : "INACTIVE"));
-    }
-
     public String getStatus() {
-        return String.format("%s (%s): %s", name, deviceType,
-                Boolean.TRUE.equals(isActive) ? "ACTIVE" : "INACTIVE");
+        return isActive ? "Active" : "Inactive";
     }
-
-    public boolean isTurnedOn() {
-        return Boolean.TRUE.equals(isActive);
-    }
-
-    public void setTurnedOn(boolean turnedOn) {
-        this.isActive = turnedOn;
-    }
-
 }
