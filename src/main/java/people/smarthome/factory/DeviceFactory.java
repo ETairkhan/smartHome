@@ -15,9 +15,9 @@ public class DeviceFactory {
         Light light = new Light();
         light.setName(name);
         light.setDeviceType("LIGHT");
-        light.setBrightness(50); // Set default brightness
-        light.setPowerLevel(60); // Default power level
-        light.setIsActive(true); // Default state is inactive
+        light.setBrightness(50);
+        light.setPowerLevel(60);
+        light.setIsActive(true);
         return light;
     }
 
@@ -25,9 +25,9 @@ public class DeviceFactory {
         Thermostat thermostat = new Thermostat();
         thermostat.setName(name);
         thermostat.setDeviceType("THERMOSTAT");
-        thermostat.setTemperature(22); // Default temperature
-        thermostat.setPowerLevel(30); // Default power level
-        thermostat.setIsActive(true); // Default state is active
+        thermostat.setTemperature(22);
+        thermostat.setPowerLevel(30);
+        thermostat.setIsActive(true);
         return thermostat;
     }
 
@@ -35,9 +35,9 @@ public class DeviceFactory {
         Sprinkler sprinkler = new Sprinkler();
         sprinkler.setName(name);
         sprinkler.setDeviceType("SPRINKLER");
-        sprinkler.setWaterFlow(50); // Default water flow
-        sprinkler.setPowerLevel(40); // Default power level
-        sprinkler.setIsActive(true); // Default state is inactive
+        sprinkler.setWaterFlow(50);
+        sprinkler.setPowerLevel(40);
+        sprinkler.setIsActive(true);
         return sprinkler;
     }
 
@@ -45,9 +45,9 @@ public class DeviceFactory {
         Door door = new Door();
         door.setName(name);
         door.setDeviceType("DOOR");
-        door.setIsLocked(true); // Default door is locked
-        door.setPowerLevel(10); // Default power level
-        door.setIsActive(true); // Default state is inactive
+        door.setIsLocked(true);
+        door.setPowerLevel(10);
+        door.setIsActive(true);
         return door;
     }
 
@@ -55,9 +55,9 @@ public class DeviceFactory {
         Window window = new Window();
         window.setName(name);
         window.setDeviceType("WINDOW");
-        window.setIsLocked(true); // Default window is locked
-        window.setPowerLevel(5); // Default power level
-        window.setIsActive(true); // Default state is inactive
+        window.setIsLocked(true);
+        window.setPowerLevel(5);
+        window.setIsActive(true);
         return window;
     }
 

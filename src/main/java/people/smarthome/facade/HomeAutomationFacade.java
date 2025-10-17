@@ -79,10 +79,9 @@ public class HomeAutomationFacade {
 
 
     public List<String> getDeviceStatuses() {
-        // Corrected: Log each device's status
         devices.forEach(device -> log.info("Device: {} - Status: {}", device.getName(), device.getStatus())); // Log device status
         return devices.stream()
-                .map(Device::getStatus)  // Return the status of each device
+                .map(Device::getStatus)
                 .collect(Collectors.toList());
     }
 }

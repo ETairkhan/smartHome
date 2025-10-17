@@ -23,8 +23,6 @@ import java.util.Map;
 @Slf4j
 public class SmartHomeService {
     private final HomeAutomationFacade homeAutomationFacade;
-
-    // Inject the specific repositories for each device type
     private final DoorRepository doorRepository;
     private final LightRepository lightRepository;
     private final SprinklerRepository sprinklerRepository;
@@ -37,7 +35,6 @@ public class SmartHomeService {
     @PostConstruct
     @Transactional
     public void initialize() {
-        // Ensure default devices are created if no devices exist in the DB
         if (doorRepository.count() == 0 && lightRepository.count() == 0 &&
                 sprinklerRepository.count() == 0 && thermostatRepository.count() == 0 && windowRepository.count() == 0) {
             createDefaultDevices();
@@ -58,10 +55,8 @@ public class SmartHomeService {
                 deviceFactory.createWindow("Kitchen Window")
         );
 
-        // Log creation
         log.info("Creating {} default devices", defaultDevices.size());
 
-        // Save the default devices to their respective repositories
         defaultDevices.forEach(device -> {
             if (device instanceof Light) {
                 lightRepository.save((Light) device);
@@ -93,7 +88,6 @@ public class SmartHomeService {
         List<Thermostat> thermostats = thermostatRepository.findAll();
         List<Window> windows = windowRepository.findAll();
 
-        // Add devices to the map (with ID generation and enhancement)
         doors.forEach(door -> {
             devices.put("doors_" + door.getId(), enhanceDevice(door));
             log.info("Loaded device: {} - {}", door.getName(), door.getStatus()); // Log each device
@@ -125,7 +119,6 @@ public class SmartHomeService {
     }
 
     private Device enhanceDevice(Device device) {
-        // Apply device-specific enhancements based on device type
         return switch (device.getDeviceType()) {
             case "LIGHT" -> new SmartAssistantDecorator(new EcoFriendlyDecorator(device));
             case "THERMOSTAT" -> new CloudConnectDecorator(new SmartAssistantDecorator(device));
@@ -136,7 +129,6 @@ public class SmartHomeService {
         };
     }
 
-    // Public API Methods
     public void activateScene(String scene) {
         homeAutomationFacade.activateScene(scene);
         saveDeviceStates();
@@ -168,12 +160,9 @@ public class SmartHomeService {
         return available;
     }
 
-
-    // Device Management Methods
     public String addNewDevice(String name, String deviceType) {
         Device newDevice = deviceFactory.createFromType(name, deviceType);
 
-        // Save the new device to the appropriate repository
         if (newDevice instanceof Light) {
             newDevice = lightRepository.save((Light) newDevice);
         } else if (newDevice instanceof Thermostat) {
@@ -219,7 +208,6 @@ public class SmartHomeService {
         return List.of("LIGHT", "THERMOSTAT", "SPRINKLER", "DOOR", "WINDOW");
     }
 
-    // Private helper methods
     private Device getDevice(String deviceId) {
         return devices.computeIfAbsent(deviceId,
                 id -> { throw new IllegalArgumentException("Device not found: " + id); });
@@ -253,7 +241,6 @@ public class SmartHomeService {
 
     private void saveDeviceState(Device device) {
         try {
-            // Save state to the correct repository
             if (device instanceof Light) {
                 lightRepository.save((Light) device);
             } else if (device instanceof Thermostat) {

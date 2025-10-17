@@ -12,8 +12,7 @@ public class DecoratorConfig {
     @Bean
     @Primary
     public Device baseDevice() {
-        // Instantiate a concrete subclass (e.g., Light)
-        Device device = new Light();  // Change this to any concrete subclass
+        Device device = new Light();
         device.setName("Base Device");
         device.setDeviceType("BASE");
         return device;
