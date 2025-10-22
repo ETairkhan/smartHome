@@ -79,37 +79,35 @@ public class SmartHomeCommands {
     public String setPowerLevel(
             @ShellOption String deviceName,  // Accept device name
             @ShellOption int powerLevel) {
-        String deviceId = smartHomeService.getDeviceIdByName(deviceName); // Get device ID by name
+        String deviceId = smartHomeService.getDeviceIdByName(deviceName);
         smartHomeService.setPowerLevel(deviceId, powerLevel);
         return "Set power level of device " + deviceName + " to " + powerLevel;
     }
 
-    // Command to set brightness for a light by device name
     @ShellMethod(key = "set-brightness", value = "Set brightness for a light")
     public String setBrightness(
-            @ShellOption String deviceName,  // Accept device name
+            @ShellOption String deviceName,
             @ShellOption int brightness) {
-        String deviceId = smartHomeService.getDeviceIdByName(deviceName); // Get device ID by name
+        String deviceId = smartHomeService.getDeviceIdByName(deviceName);
         smartHomeService.setBrightness(deviceId, brightness);
         return "Set brightness of light " + deviceName + " to " + brightness;
     }
 
-    // Command to set water flow for a sprinkler by device name
     @ShellMethod(key = "set-water-flow", value = "Set water flow for a sprinkler")
     public String setWaterFlow(
-            @ShellOption String deviceName,  // Accept device name
+            @ShellOption String deviceName,
             @ShellOption int waterFlow) {
-        String deviceId = smartHomeService.getDeviceIdByName(deviceName); // Get device ID by name
+        String deviceId = smartHomeService.getDeviceIdByName(deviceName);
         smartHomeService.setWaterFlow(deviceId, waterFlow);
         return "Set water flow of sprinkler " + deviceName + " to " + waterFlow;
     }
 
-    // Command to set temperature for a thermostat by device name
+
     @ShellMethod(key = "set-temperature", value = "Set temperature for a thermostat")
     public String setTemperature(
-            @ShellOption String deviceName,  // Accept device name
+            @ShellOption String deviceName,
             @ShellOption int temperature) {
-        String deviceId = smartHomeService.getDeviceIdByName(deviceName); // Get device ID by name
+        String deviceId = smartHomeService.getDeviceIdByName(deviceName);
         smartHomeService.setTemperature(deviceId, temperature);
         return "Set temperature of thermostat " + deviceName + " to " + temperature;
     }
@@ -150,7 +148,7 @@ public class SmartHomeCommands {
             ------------------
             """);
 
-        // List all available devices and their IDs
+
         devices.forEach((id, name) ->
                 help.append("• ").append(id).append(" - ").append(name).append("\n"));
 

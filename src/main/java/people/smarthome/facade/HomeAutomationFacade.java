@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import people.smarthome.models.Device;
 import org.springframework.stereotype.Component;
 import people.smarthome.models.*;
-
+import people.smarthome.service.SmartHomeService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,9 +39,11 @@ public class HomeAutomationFacade {
     }
 
     private void activateNightMode() {
+
         devices.forEach(device -> {
-            device.setIsActive(false);
-            if ("LIGHT".equals(device.getDeviceType()) && device instanceof Light light ) {
+            Device baseDevice = SmartHomeService.getBaseDevice(device);
+            baseDevice.setIsActive(false);
+            if ("LIGHT".equals(baseDevice.getDeviceType()) && baseDevice instanceof Light light ) {
                 light.setBrightness(10);
             }
         });
@@ -49,20 +51,28 @@ public class HomeAutomationFacade {
 
     private void activatePartyMode() {
         devices.forEach(device -> {
-            if ("LIGHT".equals(device.getDeviceType()) && device instanceof Light light) {
-                device.setIsActive(true);
+            Device baseDevice = SmartHomeService.getBaseDevice(device);
+            baseDevice.setIsActive(true);
+            if ("LIGHT".equals(baseDevice.getDeviceType()) && baseDevice instanceof Light light ) {
                 light.setBrightness(80);
+            }
+            if ("DOOR".equals(baseDevice.getDeviceType()) && baseDevice instanceof Door door) {
+                door.setIsLocked(false);
+            }
+            if ("WINDOW".equals(baseDevice.getDeviceType()) && baseDevice instanceof Window window) {
+                window.setIsLocked(false);
             }
         });
     }
 
     private void activateAwayMode() {
         devices.forEach(device -> {
-            device.setIsActive(false);
-            if ("DOOR".equals(device.getDeviceType()) && device instanceof Door door) {
+            Device baseDevice = SmartHomeService.getBaseDevice(device);
+            baseDevice.setIsActive(false);
+            if ("DOOR".equals(baseDevice.getDeviceType()) && baseDevice instanceof Door door) {
                 door.setIsLocked(true);
             }
-            if ("WINDOW".equals(device.getDeviceType()) && device instanceof Window window) {
+            if ("WINDOW".equals(baseDevice.getDeviceType()) && baseDevice instanceof Window window) {
                 window.setIsLocked(true);
             }
         });
@@ -70,7 +80,8 @@ public class HomeAutomationFacade {
 
     private void activateGardenMode() {
         devices.forEach(device -> {
-            if ("SPRINKLER".equals(device.getDeviceType()) && device instanceof Sprinkler sprinkler) {
+            Device baseDevice = SmartHomeService.getBaseDevice(device);
+            if ("SPRINKLER".equals(baseDevice.getDeviceType()) && baseDevice instanceof Sprinkler sprinkler) {
                 sprinkler.setIsActive(true);
                 sprinkler.setWaterFlow(75);
             }

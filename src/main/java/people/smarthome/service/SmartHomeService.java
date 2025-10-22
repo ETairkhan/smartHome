@@ -209,7 +209,7 @@ public class SmartHomeService {
     }
 
 
-    private Device getBaseDevice(Device device) {
+    public static Device getBaseDevice(Device device) {
         while (device instanceof DeviceDecorator) {
             device = ((DeviceDecorator) device).getDecoratedDevice();
         }
