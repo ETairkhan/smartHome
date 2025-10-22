@@ -81,7 +81,7 @@ public class SmartHomeService {
 
 
     private void loadDevicesFromDatabase() {
-        // Fetch devices from specific repositories
+
         List<Door> doors = doorRepository.findAll();
         List<Light> lights = lightRepository.findAll();
         List<Sprinkler> sprinklers = sprinklerRepository.findAll();
@@ -90,23 +90,23 @@ public class SmartHomeService {
 
         doors.forEach(door -> {
             devices.put("doors_" + door.getId(), enhanceDevice(door));
-            log.info("Loaded device: {} - {}", door.getName(), door.getStatus()); // Log each device
+            log.info("Loaded device: {} - {}", door.getName(), door.getStatus()); 
         });
         lights.forEach(light -> {
             devices.put("lights_" + light.getId(), enhanceDevice(light));
-            log.info("Loaded device: {} - {}", light.getName(), light.getStatus()); // Log each device
+            log.info("Loaded device: {} - {}", light.getName(), light.getStatus()); 
         });
         sprinklers.forEach(sprinkler -> {
             devices.put("sprinklers_" + sprinkler.getId(), enhanceDevice(sprinkler));
-            log.info("Loaded device: {} - {}", sprinkler.getName(), sprinkler.getStatus()); // Log each device
+            log.info("Loaded device: {} - {}", sprinkler.getName(), sprinkler.getStatus()); 
         });
         thermostats.forEach(thermostat -> {
             devices.put("thermostats_" + thermostat.getId(), enhanceDevice(thermostat));
-            log.info("Loaded device: {} - {}", thermostat.getName(), thermostat.getStatus()); // Log each device
+            log.info("Loaded device: {} - {}", thermostat.getName(), thermostat.getStatus()); 
         });
         windows.forEach(window -> {
             devices.put("windows_" + window.getId(), enhanceDevice(window));
-            log.info("Loaded device: {} - {}", window.getName(), window.getStatus()); // Log each device
+            log.info("Loaded device: {} - {}", window.getName(), window.getStatus()); 
         });
 
         homeAutomationFacade.addDevices(new ArrayList<>(devices.values()));
@@ -173,7 +173,7 @@ public class SmartHomeService {
         Map<String, String> available = new HashMap<>();
         devices.forEach((id, device) -> {
             available.put(id, getBaseDevice(device).getName());
-            log.info("Available Device: {} - {}", id, getBaseDevice(device).getName());  // Log each device
+            log.info("Available Device: {} - {}", id, getBaseDevice(device).getName()); 
         });
         return available;
     }
@@ -287,16 +287,16 @@ public class SmartHomeService {
 
 
     public String getDeviceIdByName(String deviceName) {
-        log.info("Searching for device with name: {}", deviceName);  // Log the device name being searched
-        // Iterate through all devices and compare names (case-insensitive)
+        log.info("Searching for device with name: {}", deviceName);
+
         for (Map.Entry<String, Device> entry : devices.entrySet()) {
-            log.debug("Checking device: {} with name: {}", entry.getKey(), entry.getValue().getName()); // Log each device checked
+            log.debug("Checking device: {} with name: {}", entry.getKey(), entry.getValue().getName());
             if (entry.getValue().getName().equalsIgnoreCase(deviceName.trim())) {
-                log.info("Device found: {} with ID: {}", deviceName, entry.getKey()); // Log successful match
-                return entry.getKey(); // Return the device ID if names match
+                log.info("Device found: {} with ID: {}", deviceName, entry.getKey());
+                return entry.getKey();
             }
         }
-        log.warn("Device with name '{}' not found", deviceName);  // Log if the device was not found
+        log.warn("Device with name '{}' not found", deviceName);
         throw new IllegalArgumentException("Device with name '" + deviceName + "' not found.");
     }
 
@@ -313,12 +313,12 @@ public class SmartHomeService {
     public void setBrightness(String deviceId, int brightness) {
         log.info("Setting brightness for device {} to {}", deviceId, brightness);
 
-        Device device = getDevice(deviceId);  // Get the decorated device
-        Device baseDevice = getBaseDevice(device);  // Get the base device (unwrapped from the decorator)
+        Device device = getDevice(deviceId);
+        Device baseDevice = getBaseDevice(device);
 
         if (baseDevice instanceof Light) {
-            ((Light) baseDevice).setBrightness(brightness);  // Set brightness for the base Light device
-            saveDeviceState(baseDevice);  // Save the device state to the database
+            ((Light) baseDevice).setBrightness(brightness);
+            saveDeviceState(baseDevice);
             log.info("Brightness for device {} set to {}", deviceId, brightness);
         } else {
             throw new IllegalArgumentException("Device is not a light.");
@@ -331,12 +331,12 @@ public class SmartHomeService {
     public void setWaterFlow(String deviceId, int waterFlow) {
         log.info("Setting water flow for device {} to {}", deviceId, waterFlow);
 
-        Device device = getDevice(deviceId);  // Get the decorated device
-        Device baseDevice = getBaseDevice(device);  // Get the base device (unwrapped from the decorator)
+        Device device = getDevice(deviceId);
+        Device baseDevice = getBaseDevice(device);
 
         if (baseDevice instanceof Sprinkler) {
-            ((Sprinkler) baseDevice).setWaterFlow(waterFlow);  // Set water flow for the base Sprinkler device
-            saveDeviceState(baseDevice);  // Save the device state to the database
+            ((Sprinkler) baseDevice).setWaterFlow(waterFlow);
+            saveDeviceState(baseDevice);
             log.info("Water flow for device {} set to {}", deviceId, waterFlow);
         } else {
             throw new IllegalArgumentException("Device is not a sprinkler.");
@@ -347,16 +347,14 @@ public class SmartHomeService {
     public void setTemperature(String deviceId, int temperature) {
         log.info("Setting temperature for device {} to {}", deviceId, temperature);
 
-        // Get the decorated device first
+
         Device device = getDevice(deviceId);
 
-        // Unwrap the decorator and get the base device
         Device baseDevice = getBaseDevice(device);
 
-        // Check if the base device is a Thermostat
         if (baseDevice instanceof Thermostat) {
-            ((Thermostat) baseDevice).setTemperature(temperature);  // Set temperature for the base Thermostat device
-            saveDeviceState(baseDevice);  // Save the device state to the database
+            ((Thermostat) baseDevice).setTemperature(temperature);
+            saveDeviceState(baseDevice);
             log.info("Temperature for device {} set to {}", deviceId, temperature);
         } else {
             throw new IllegalArgumentException("Device is not a thermostat.");
@@ -365,7 +363,6 @@ public class SmartHomeService {
 
 
 
-    // Helper method to get device by ID
     private Device getDevice(String deviceId) {
         Device device = devices.get(deviceId);
         if (device == null) {

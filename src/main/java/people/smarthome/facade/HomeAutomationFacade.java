@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class HomeAutomationFacade {
-    private static final Logger log = LoggerFactory.getLogger(HomeAutomationFacade.class); // Define the logger
+    private static final Logger log = LoggerFactory.getLogger(HomeAutomationFacade.class);
     private final List<Device> devices;
 
     public HomeAutomationFacade() {
@@ -90,7 +90,7 @@ public class HomeAutomationFacade {
 
 
     public List<String> getDeviceStatuses() {
-        devices.forEach(device -> log.info("Device: {} - Status: {}", device.getName(), device.getStatus())); // Log device status
+        devices.forEach(device -> log.info("Device: {} - Status: {}", device.getName(), device.getStatus()));
         return devices.stream()
                 .map(Device::getStatus)
                 .collect(Collectors.toList());
