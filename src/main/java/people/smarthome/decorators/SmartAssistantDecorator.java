@@ -11,7 +11,7 @@ public class SmartAssistantDecorator extends DeviceDecorator {
     }
 
     @Override
-    protected void performEnhancedAction() {
+    public void performEnhancedAction() {
         System.out.println("🤖 Assistant: " + getName() + " status updated");
     }
 

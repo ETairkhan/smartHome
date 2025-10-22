@@ -26,7 +26,7 @@ public abstract class DeviceDecorator extends Device {
     }
 
     // Abstract methods that subclasses must implement
-    protected abstract void performEnhancedAction();
+    public abstract void performEnhancedAction();
     protected abstract String getEnhancementStatus();
 
     // Delegation methods for all Device properties

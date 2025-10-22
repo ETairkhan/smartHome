@@ -74,10 +74,10 @@ public class SmartHomeCommands {
         return output.toString();
     }
 
-    // Command to set power level by device name
+
     @ShellMethod(key = "set-power-level", value = "Set the power level for a device")
     public String setPowerLevel(
-            @ShellOption String deviceName,  // Accept device name
+            @ShellOption String deviceName,
             @ShellOption int powerLevel) {
         String deviceId = smartHomeService.getDeviceIdByName(deviceName);
         smartHomeService.setPowerLevel(deviceId, powerLevel);

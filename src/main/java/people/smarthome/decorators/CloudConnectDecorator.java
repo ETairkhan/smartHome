@@ -11,7 +11,7 @@ public class CloudConnectDecorator extends DeviceDecorator {
     }
 
     @Override
-    protected void performEnhancedAction() {
+    public void performEnhancedAction() {
         syncWithCloud();
     }
 

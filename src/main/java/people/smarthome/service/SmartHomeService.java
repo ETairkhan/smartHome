@@ -144,12 +144,30 @@ public class SmartHomeService {
         saveDeviceState(device);
     }
 
+    @Transactional
     public void enhanceDevice(String deviceId, String enhancement) {
+        log.info("Enhancing device {} with enhancement {}", deviceId, enhancement);
+
         Device original = getBaseDevice(getDevice(deviceId));
+
+        log.debug("Original device type: {}", original.getClass().getSimpleName());
+
         Device enhanced = applyEnhancement(original, enhancement);
         devices.put(deviceId, enhanced);
+
+        log.debug("Enhanced device type: {}", enhanced.getClass().getSimpleName());
+
+        if (enhanced instanceof DeviceDecorator) {
+            ((DeviceDecorator) enhanced).performEnhancedAction();
+        }
+
+        saveDeviceState(enhanced);
+
         updateFacade();
+
+        log.info("Enhancement applied: {} for device {}", enhancement, deviceId);
     }
+
 
     public Map<String, String> getAvailableDevices() {
         Map<String, String> available = new HashMap<>();
@@ -237,28 +255,27 @@ public class SmartHomeService {
 
     private void saveDeviceState(Device device) {
         try {
-            // Check if the device is decorated, if yes, delegate the save operation to the decorated device
-            Device baseDevice = getBaseDevice(device);  // Get the actual base device
+            Device baseDevice = getBaseDevice(device);
 
             if (baseDevice instanceof Light) {
                 lightRepository.save((Light) baseDevice);
-                lightRepository.flush();  // Ensure the changes are immediately flushed to the database
+                lightRepository.flush();
                 log.info("Saved Light device '{}' with power level {}", baseDevice.getName(), baseDevice.getPowerLevel());
             } else if (baseDevice instanceof Thermostat) {
                 thermostatRepository.save((Thermostat) baseDevice);
-                thermostatRepository.flush();  // Ensure the changes are immediately flushed to the database
+                thermostatRepository.flush();
                 log.info("Saved Thermostat device '{}' with temperature {}", baseDevice.getName(), ((Thermostat) baseDevice).getTemperature());
             } else if (baseDevice instanceof Sprinkler) {
                 sprinklerRepository.save((Sprinkler) baseDevice);
-                sprinklerRepository.flush();  // Ensure the changes are immediately flushed to the database
+                sprinklerRepository.flush();
                 log.info("Saved Sprinkler device '{}' with water flow {}", baseDevice.getName(), ((Sprinkler) baseDevice).getWaterFlow());
             } else if (baseDevice instanceof Door) {
                 doorRepository.save((Door) baseDevice);
-                doorRepository.flush();  // Ensure the changes are immediately flushed to the database
+                doorRepository.flush();
                 log.info("Saved Door device '{}' with power level {}", baseDevice.getName(), baseDevice.getPowerLevel());
             } else if (baseDevice instanceof Window) {
                 windowRepository.save((Window) baseDevice);
-                windowRepository.flush();  // Ensure the changes are immediately flushed to the database
+                windowRepository.flush();
                 log.info("Saved Window device '{}' with state {}", baseDevice.getName(), baseDevice.getIsActive());
             }
         } catch (Exception e) {

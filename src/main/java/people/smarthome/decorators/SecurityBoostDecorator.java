@@ -1,17 +1,16 @@
 package people.smarthome.decorators;
 
 import people.smarthome.models.Device;
-import org.springframework.stereotype.Component;
 
-@Component
 public class SecurityBoostDecorator extends DeviceDecorator {
 
     public SecurityBoostDecorator(Device decoratedDevice) {
         super(decoratedDevice);
+
     }
 
     @Override
-    protected void performEnhancedAction() {
+    public void performEnhancedAction() {
         enhanceSecurity();
     }
 
@@ -22,6 +21,8 @@ public class SecurityBoostDecorator extends DeviceDecorator {
 
     private void enhanceSecurity() {
         if ("DOOR".equals(getDeviceType())) {
+            autoLock();
+        } else if ("WINDOW".equals(getDeviceType())) {
             autoLock();
         }
     }

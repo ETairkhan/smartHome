@@ -11,7 +11,7 @@ public class EcoFriendlyDecorator extends DeviceDecorator {
     }
 
     @Override
-    protected void performEnhancedAction() {
+    public void performEnhancedAction() {
         applyEcoSettings();
     }
 
